@@ -8,7 +8,7 @@ from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from tqdm import tqdm 
 
-dataset = pd.read_csv("Reviews/Reviews.csv", nrows=50000)
+dataset = pd.read_csv("Reviews/Reviews.csv")
 
 print(dataset.shape)
 print(dataset.columns)
@@ -70,12 +70,29 @@ print("Test set size: ", X_test.shape)
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 
-model = LogisticRegression(max_iter=1000)
+model = LogisticRegression(max_iter=1000, class_weight="balanced")
 model.fit(X_train, y_train)
 y_pred = model.predict(X_test)
 
 print("Accuracy: ", accuracy_score(y_test,y_pred))
-
 print("\nClassification Report:\n",classification_report(y_test,y_pred))
-
 print("\nConfusion Matrix:\n", confusion_matrix(y_test,y_pred))
+
+# Naive Bayes
+from sklearn.naive_bayes import MultinomialNB
+
+nb_model=MultinomialNB()
+nb_model.fit(X_train, y_train)
+
+y_pred_nb = nb_model.predict(X_test)
+print("NAIVE BAYES\n")
+print("Accuracy: ", accuracy_score(y_test,y_pred_nb))
+print("\n Classification Report:\n",classification_report(y_test,y_pred_nb))
+print("\n Confusion Matrix: \n",confusion_matrix(y_test,y_pred_nb))
+
+from joblib import dump
+import os
+os.makedirs("models", exist_ok=True)
+
+dump(tfidf,"models/tfidf_vectorizer.joblib")
+dump(model, "models/logistic_model.joblib")
